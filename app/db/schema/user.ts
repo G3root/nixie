@@ -1,14 +1,13 @@
-import { sql } from 'drizzle-orm'
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { defineTable } from 'kysely-sqlite-builder/schema'
 
-export const user = sqliteTable('user', {
-  id: text('id').primaryKey(),
-  email: text('email').unique().notNull(),
-
-  createdAt: integer('created_at', { mode: 'timestamp' }).default(
-    sql`(strftime('%s', 'now'))`,
-  ),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(
-    sql`(strftime('%s', 'now'))`,
-  ),
-})
+export const userTable = defineTable(
+  {
+    id: { type: 'string', notNull: true },
+    email: { type: 'string', notNull: true },
+  },
+  {
+    primary: 'id',
+    timeTrigger: { create: true, update: true },
+    unique: ['email'],
+  },
+)

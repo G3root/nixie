@@ -1,18 +1,13 @@
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator'
-import { drzldb } from './index'
+/* eslint-disable react-hooks/rules-of-hooks */
+
+import { useSchema } from 'kysely-sqlite-builder/schema'
+import { db } from '.'
+import { baseTables } from './tables'
 
 async function main() {
-  console.log('Running migrations')
+  await db.updateTableSchema(useSchema(baseTables))
 
-  migrate(drzldb, { migrationsFolder: 'drizzle' })
-
-  console.log('Migrated successfully')
-
-  process.exit(0)
+  await db.destroy()
 }
 
-main().catch(e => {
-  console.error('Migration failed')
-  console.error(e)
-  process.exit(1)
-})
+main()
