@@ -1,6 +1,4 @@
-const buildRouteFilePath = path => {
-  return `routes${path ? path : ''}/page.tsx`
-}
+import { flatRoutes } from 'remix-flat-routes'
 
 /** @type {import('@remix-run/dev').AppConfig} */
 export default {
@@ -13,10 +11,9 @@ export default {
   // publicPath: "/build/",
   // serverBuildPath: "build/index.js",
 
-  routes: defineRoutes => {
-    return defineRoutes(route => {
-      route('/', buildRouteFilePath(''), { index: true })
-      route('/login', buildRouteFilePath('/login'), { index: true })
+  routes: async defineRoutes => {
+    return flatRoutes('routes', defineRoutes, {
+      ignoredRouteFiles: ['**/*.test.{js,jsx,ts,tsx}', '**/__*.*'],
     })
   },
 }
