@@ -32,7 +32,9 @@
     "isbot": "^4.1.0",
     "kysely": "^0.27.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "remix-auth": "^3.6.0",
+    "remix-auth-totp": "^2.0.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.5.1",
