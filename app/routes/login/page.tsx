@@ -4,6 +4,8 @@ import {
   type LoaderFunctionArgs,
 } from '@remix-run/node'
 import { Form, useLoaderData } from '@remix-run/react'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
 import { authenticator } from '~/features/auth/auth.server'
 import { commitSession, getSession } from '~/features/auth/auth-session.server'
 
@@ -44,16 +46,14 @@ export default function Login() {
 
   return (
     <div className="mx-auto flex h-screen w-screen max-w-7xl flex-col px-6">
-      {/* Content */}
       <div className="mx-auto flex h-full w-full max-w-[350px] flex-col items-center justify-center gap-6">
-        {/* Email Form */}
         <div className="flex w-full flex-col items-center gap-6">
           <div className="flex w-full flex-col items-center justify-center gap-2">
             <div className="flex flex-col items-center gap-1">
               <h1 className="text-center text-2xl font-semibold tracking-tight">
                 Welcome back
               </h1>
-              <p className="text-center text-base font-normal text-gray-600">
+              <p className="text-muted-foreground text-center text-base font-normal ">
                 Log in or sign in to your account
               </p>
             </div>
@@ -68,23 +68,16 @@ export default function Login() {
               <label htmlFor="email" className="sr-only">
                 Email
               </label>
-              <input
+
+              <Input
                 type="email"
                 name="email"
                 defaultValue={authEmail ? authEmail : ''}
                 placeholder="name@example.com"
-                className="h-11 rounded-md border-2 border-gray-200 bg-transparent px-4 text-base font-semibold placeholder:font-normal placeholder:text-gray-400"
                 required
               />
             </div>
-            <button
-              type="submit"
-              className="clickable flex h-10 items-center justify-center rounded-md bg-gray-800"
-            >
-              <span className="text-sm font-semibold text-white">
-                Continue with Email
-              </span>
-            </button>
+            <Button type="submit">Continue with Email</Button>
           </Form>
         </div>
 
@@ -94,11 +87,6 @@ export default function Login() {
             {authError.message}
           </span>
         )}
-
-        <p className="text-center text-xs leading-relaxed text-gray-400">
-          By continuing, you agree to our{' '}
-          <span className="clickable underline">Terms of Service</span>
-        </p>
       </div>
     </div>
   )
