@@ -1,4 +1,5 @@
 import type { MetaFunction } from '@remix-run/node'
+import { Icon } from '~/components/ui/icon'
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,5 +9,9 @@ export const meta: MetaFunction = () => {
 }
 
 export default function Index() {
-  return <div>hello world</div>
+  return (
+    <div>
+      hello world <Icon name="x" />
+    </div>
+  )
 }
