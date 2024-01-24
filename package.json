@@ -13,7 +13,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc",
-    "clean": "rimraf build"
+    "clean": "rimraf build",
+    "db:push": "drizzle-kit push:sqlite",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:migrate": "tsx ./app/db/migrate.ts"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.0.2",
@@ -27,6 +30,7 @@
     "better-sqlite3": "^9.3.0",
     "drizzle-orm": "^0.29.3",
     "isbot": "^4.1.0",
+    "kysely": "^0.27.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -34,6 +38,7 @@
     "@remix-run/dev": "^2.5.1",
     "@remix-run/eslint-config": "^2.5.1",
     "@sly-cli/sly": "^1.8.0",
+    "@types/better-sqlite3": "^7.6.8",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
@@ -58,6 +63,7 @@
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.7.0",
+    "type-fest": "^4.10.1",
     "typescript": "^5.1.6",
     "vite": "^5.0.12",
     "vite-tsconfig-paths": "^4.3.1"
