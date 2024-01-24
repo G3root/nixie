@@ -5,10 +5,10 @@ export const totp = sqliteTable(
   'totp',
   {
     id: text('id').primaryKey(),
-    hash: text('hash').unique(),
-    attempts: integer('attempts').default(0),
-    active: integer('active', { mode: 'boolean' }),
-    expiresAt: integer('expires_at', { mode: 'timestamp' }),
+    hash: text('hash').unique().notNull(),
+    attempts: integer('attempts').default(0).notNull(),
+    active: integer('active', { mode: 'boolean' }).notNull(),
+    expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 
     createdAt: integer('created_at', { mode: 'timestamp' }).default(
       sql`(strftime('%s', 'now'))`,
