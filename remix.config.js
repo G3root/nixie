@@ -8,4 +8,10 @@ export default {
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",
   // serverBuildPath: "build/index.js",
+
+  routes: defineRoutes => {
+    return defineRoutes(route => {
+      route('/', 'routes/page.tsx', { index: true })
+    })
+  },
 }
