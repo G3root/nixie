@@ -1,3 +1,7 @@
+const buildRouteFilePath = path => {
+  return `routes${path ? path : ''}/page.tsx`
+}
+
 /** @type {import('@remix-run/dev').AppConfig} */
 export default {
   ignoredRouteFiles: ['**/.*'],
@@ -11,7 +15,8 @@ export default {
 
   routes: defineRoutes => {
     return defineRoutes(route => {
-      route('/', 'routes/page.tsx', { index: true })
+      route('/', buildRouteFilePath(''), { index: true })
+      route('/login', buildRouteFilePath('/login'), { index: true })
     })
   },
 }
