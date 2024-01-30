@@ -1,25 +1,20 @@
-import { type ComponentProps, useId, useRef } from 'react'
-import { useInputEvent } from '@conform-to/react'
-import { Checkbox } from './ui/checkbox'
-import { Input } from './ui/input'
+import { createContext, forwardRef, useContext, useId } from 'react'
+import type * as LabelPrimitive from '@radix-ui/react-label'
+import { Slot } from '@radix-ui/react-slot'
+import { cn } from '~/utils/misc'
 import { Label } from './ui/label'
-import { Textarea } from './ui/textarea'
 
 export type ListOfErrors = Array<string | null | undefined> | null | undefined
 
-export function ErrorList({
-  id,
-  errors,
-}: {
-  errors?: ListOfErrors
-  id?: string
-}) {
+export function ErrorList({ errors }: { errors?: ListOfErrors }) {
+  const { formDescriptionId } = useFormField()
   const errorsToRender = errors?.filter(Boolean)
   if (!errorsToRender?.length) return null
+
   return (
-    <ul id={id} className="flex flex-col gap-1">
+    <ul id={formDescriptionId} className="flex flex-col gap-1">
       {errorsToRender.map(e => (
-        <li key={e} className="text-foreground-destructive text-[10px]">
+        <li key={e} className="text-[0.7rem] font-medium text-destructive">
           {e}
         </li>
       ))}
@@ -27,122 +22,98 @@ export function ErrorList({
   )
 }
 
-export function Field({
-  labelProps,
-  inputProps,
-  errors,
-  className,
-}: {
-  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
-  inputProps: React.InputHTMLAttributes<HTMLInputElement>
-  errors?: ListOfErrors
-  className?: string
-}) {
-  const fallbackId = useId()
-  const id = inputProps.id ?? fallbackId
-  const errorId = errors?.length ? `${id}-error` : undefined
-  return (
-    <div className={className}>
-      <Label htmlFor={id} {...labelProps} />
-      <Input
-        id={id}
-        aria-invalid={errorId ? true : undefined}
-        aria-describedby={errorId}
-        {...inputProps}
-      />
-      <div className="min-h-[32px] px-4 pb-3 pt-1">
-        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
-      </div>
-    </div>
-  )
+const useFormField = () => {
+  const itemContext = useContext(FormItemContext)
+
+  const { id, isErrored, errors } = itemContext
+
+  return {
+    id,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
+    isErrored,
+    errors,
+  }
 }
 
-export function TextareaField({
-  labelProps,
-  textareaProps,
-  errors,
-  className,
-}: {
-  labelProps: React.LabelHTMLAttributes<HTMLLabelElement>
-  textareaProps: React.TextareaHTMLAttributes<HTMLTextAreaElement>
-  errors?: ListOfErrors
-  className?: string
-}) {
-  const fallbackId = useId()
-  const id = textareaProps.id ?? textareaProps.name ?? fallbackId
-  const errorId = errors?.length ? `${id}-error` : undefined
-  return (
-    <div className={className}>
-      <Label htmlFor={id} {...labelProps} />
-      <Textarea
-        id={id}
-        aria-invalid={errorId ? true : undefined}
-        aria-describedby={errorId}
-        {...textareaProps}
-      />
-      <div className="min-h-[32px] px-4 pb-3 pt-1">
-        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
-      </div>
-    </div>
-  )
+type FormItemContextValue = {
+  id: string
+  isErrored: boolean
+  errors: ListOfErrors
 }
 
-export function CheckboxField({
-  labelProps,
-  buttonProps,
-  errors,
-  className,
-}: {
-  labelProps: JSX.IntrinsicElements['label']
-  buttonProps: ComponentProps<typeof Checkbox>
-  errors?: ListOfErrors
-  className?: string
-}) {
-  const fallbackId = useId()
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  // To emulate native events that Conform listen to:
-  // See https://conform.guide/integrations
-  const control = useInputEvent({
-    // Retrieve the checkbox element by name instead as Radix does not expose the internal checkbox element
-    // See https://github.com/radix-ui/primitives/discussions/874
-    ref: () =>
-      buttonRef.current?.form?.elements.namedItem(buttonProps.name ?? ''),
-    onFocus: () => buttonRef.current?.focus(),
-  })
-  const id = buttonProps.id ?? buttonProps.name ?? fallbackId
-  const errorId = errors?.length ? `${id}-error` : undefined
+const FormItemContext = createContext<FormItemContextValue>(
+  {} as FormItemContextValue,
+)
+
+export const FormItem = forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    errors?: ListOfErrors
+  }
+>(({ className, errors, ...props }, ref) => {
+  const id = useId()
+
+  const isErrored = errors?.length ? true : false
   return (
-    <div className={className}>
-      <div className="flex gap-2">
-        <Checkbox
-          id={id}
-          ref={buttonRef}
-          aria-invalid={errorId ? true : undefined}
-          aria-describedby={errorId}
-          {...buttonProps}
-          onCheckedChange={state => {
-            control.change(Boolean(state.valueOf()))
-            buttonProps.onCheckedChange?.(state)
-          }}
-          onFocus={event => {
-            control.focus()
-            buttonProps.onFocus?.(event)
-          }}
-          onBlur={event => {
-            control.blur()
-            buttonProps.onBlur?.(event)
-          }}
-          type="button"
-        />
-        <label
-          htmlFor={id}
-          {...labelProps}
-          className="text-body-xs text-muted-foreground self-center"
-        />
-      </div>
-      <div className="px-4 pb-3 pt-1">
-        {errorId ? <ErrorList id={errorId} errors={errors} /> : null}
-      </div>
+    <FormItemContext.Provider value={{ id, isErrored, errors }}>
+      <div ref={ref} className={cn('space-y-2', className)} {...props} />
+    </FormItemContext.Provider>
+  )
+})
+FormItem.displayName = 'FormItem'
+
+export const FormLabel = forwardRef<
+  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+>(({ className, ...props }, ref) => {
+  const { formItemId, isErrored } = useFormField()
+
+  return (
+    <Label
+      ref={ref}
+      className={cn(isErrored && 'text-destructive', className)}
+      htmlFor={formItemId}
+      {...props}
+    />
+  )
+})
+FormLabel.displayName = 'FormLabel'
+
+export const FormMessage = forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, children }, ref) => {
+  const { errors } = useFormField()
+
+  return (
+    <div className="px-4 pb-3 pt-1">
+      <ErrorList errors={errors} />
     </div>
   )
-}
+})
+FormMessage.displayName = 'FormMessage'
+
+export const FormControl = forwardRef<
+  React.ElementRef<typeof Slot>,
+  React.ComponentPropsWithoutRef<typeof Slot>
+>(({ ...props }, ref) => {
+  const { isErrored, formItemId, formDescriptionId, formMessageId } =
+    useFormField()
+
+  return (
+    <Slot
+      ref={ref}
+      id={formItemId}
+      aria-describedby={
+        !isErrored
+          ? `${formDescriptionId}`
+          : `${formDescriptionId} ${formMessageId}`
+      }
+      aria-invalid={isErrored}
+      {...props}
+    />
+  )
+})
+FormControl.displayName = 'FormControl'
