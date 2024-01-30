@@ -29,6 +29,7 @@
     "@remix-run/node": "^2.5.1",
     "@remix-run/react": "^2.5.1",
     "@remix-run/serve": "^2.5.1",
+    "@tanstack/react-table": "^8.11.7",
     "better-sqlite3": "^9.3.0",
     "isbot": "^4.1.0",
     "kysely": "^0.27.2",
