@@ -7,6 +7,7 @@ const customIdChar = customAlphabet(
 const prefixes = {
   user: 'usr',
   totp: 'totp',
+  contact: 'cont',
   test: 'test', // for tests only
 } as const
 
