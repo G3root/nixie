@@ -25,3 +25,22 @@ export const RELATION_TYPES = [
   'Godfather',
   'Other',
 ] as const
+
+export const contactLabels = [
+  'home',
+  'work',
+  'other',
+  'main',
+  'mobile',
+] as const
+
+export const emailLabels = ['home', 'work', 'other', 'main', 'school'] as const
+
+export const addressLabels = ['home', 'work', 'other'] as const
+
+export const socialNetworkLabels = [
+  'facebook',
+  'instagram',
+  'whatsapp',
+  'github',
+] as const

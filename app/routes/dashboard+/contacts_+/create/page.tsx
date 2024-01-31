@@ -2,7 +2,6 @@ import { useForm } from '@conform-to/react'
 import { getFieldsetConstraint, parse } from '@conform-to/zod'
 import { type ActionFunctionArgs, json } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
-import { z } from 'zod'
 import {
   FormControl,
   FormItem,
@@ -18,22 +17,16 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
 import { Textarea } from '~/components/ui/textarea'
-import { RELATION_TYPES } from '~/features/contacts/constants'
+import { AddressField } from '~/features/contacts/components/contacts-form/address-field'
+import { ContactField } from '~/features/contacts/components/contacts-form/contact-field'
+import { EmailField } from '~/features/contacts/components/contacts-form/email-field'
+import { SocialField } from '~/features/contacts/components/contacts-form/social-field'
+import { createContactSchema } from '~/features/contacts/schema'
+import { trpc } from '~/trpc/trpc.server'
+import { redirectWithToast } from '~/utils/toast.server'
 
-const schema = z.object({
-  name: z.string().min(1),
-  birthday: z.string().optional(),
-  notes: z.string().optional(),
-  relation: z.enum(RELATION_TYPES),
-})
+const schema = createContactSchema
 
 const formId = 'create-contact'
 
@@ -45,6 +38,18 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!submission.value || submission.intent !== 'submit') {
     return json(submission)
   }
+
+  try {
+    await trpc({ request }).action.contact.create.mutate({
+      ...submission.value,
+    })
+
+    return redirectWithToast('/dashboard/contacts', {
+      title: 'contact created successfully',
+      type: 'success',
+      description: '',
+    })
+  } catch (error) {}
 
   return json(submission)
 }
@@ -77,30 +82,27 @@ export default function CreateContactsPage() {
               <FormMessage />
             </FormItem>
 
+            <FormItem errors={fields.job.errors}>
+              <FormLabel>Job</FormLabel>
+              <FormControl>
+                <Input name={fields.job.name} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+
+            <FormItem errors={fields.company.errors}>
+              <FormLabel>Company</FormLabel>
+              <FormControl>
+                <Input name={fields.company.name} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+
             <FormItem errors={fields.birthday.errors}>
               <FormLabel>Birthday</FormLabel>
               <FormControl>
                 <Input name={fields.birthday.name} type="date" />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-
-            <FormItem errors={fields.relation.errors}>
-              <FormLabel>Relation</FormLabel>
-              <Select name={fields.relation.name}>
-                <FormControl>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {RELATION_TYPES.map(item => (
-                    <SelectItem key={item} value={item}>
-                      {item}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
 
@@ -111,6 +113,11 @@ export default function CreateContactsPage() {
               </FormControl>
               <FormMessage />
             </FormItem>
+
+            <AddressField {...fields.address} formRef={form.ref} />
+            <EmailField {...fields.email} formRef={form.ref} />
+            <ContactField {...fields.contact} formRef={form.ref} />
+            <SocialField {...fields.social} formRef={form.ref} />
           </Form>
         </CardContent>
         <CardFooter className="justify-end">
