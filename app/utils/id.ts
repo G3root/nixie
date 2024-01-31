@@ -8,6 +8,7 @@ const prefixes = {
   user: 'usr',
   totp: 'totp',
   contact: 'cont',
+  email: 'email',
   test: 'test', // for tests only
 } as const
 
