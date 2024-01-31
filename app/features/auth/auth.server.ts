@@ -89,3 +89,8 @@ authenticator.use(
     },
   ),
 )
+
+export const withSession = (request: Request) =>
+  authenticator.isAuthenticated(request, {
+    failureRedirect: '/login',
+  })
