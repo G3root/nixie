@@ -1,4 +1,4 @@
-import { testAction } from './routers/action/test-action'
+import { contact } from './routers/action/contact'
 import { testLoader } from './routers/loader/test-loader'
 import { createTRPCRouter } from './trpc'
 
@@ -9,7 +9,7 @@ import { createTRPCRouter } from './trpc'
  */
 export const appRouter = createTRPCRouter({
   action: createTRPCRouter({
-    testAction,
+    contact,
   }),
   loader: createTRPCRouter({
     testLoader,
