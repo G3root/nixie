@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { addressLabels, contactLabels, emailLabels } from './constants'
+import {
+  addressLabels,
+  contactLabels,
+  emailLabels,
+  socialNetworkLabels,
+} from './constants'
 
 export const contactsMultiValueSchema = z.object({
   label: z.string(),
@@ -44,7 +49,7 @@ export type TContactSchema = z.infer<typeof contactSchema>
 export const socialSchema = z
   .array(
     z.object({
-      label: z.enum(contactLabels),
+      label: z.enum(socialNetworkLabels),
       value: z.string(),
     }),
   )
