@@ -11,12 +11,14 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table'
+import { Avatar, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { Icon } from '~/components/ui/icon'
@@ -70,14 +72,49 @@ export const columns: ColumnDef<Item>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
+    cell: ({ row }) => {
+      const item = row.original
+      return (
+        <div className="flex items-center gap-x-2">
+          <Avatar className="">
+            <AvatarImage
+              src={`https://api.dicebear.com/7.x/initials/svg?seed=${item.name}`}
+            />
+          </Avatar>
+
+          <div className="ml-2 flex flex-col gap-y-1">
+            <p>{item.name}</p>
+            {item.job && (
+              <p>
+                {item.job} {item.company ? `at ${item.company}` : ''}
+              </p>
+            )}
+          </div>
+        </div>
+      )
+    },
   },
+
   {
-    accessorKey: 'relation',
-    header: () => <div className="text-right">Relation</div>,
+    id: 'actions',
+    enableHiding: false,
     cell: ({ row }) => {
       return (
-        <div className="text-right font-medium">{row.getValue('relation')}</div>
+        <DropdownMenu>
+          <div className="items-end justify-end text-right">
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <Icon name="more-vertical" />
+              </Button>
+            </DropdownMenuTrigger>
+          </div>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem className="text-destructive focus:text-destructive">
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       )
     },
   },
@@ -119,10 +156,10 @@ export function ContactsTable({ data }: ContactsTableProps) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+          placeholder="Filter names..."
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={event =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
+            table.getColumn('name')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -151,7 +188,7 @@ export function ContactsTable({ data }: ContactsTableProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="mt-6 rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
